@@ -11,7 +11,7 @@
 #include <utility>
 #include <deque>
 #include <string>
-// #include <caffe/layers/memory_data_layer.hpp>
+#include <caffe/layers/memory_data_layer.hpp>
 
 namespace fast_dqn {
 
@@ -48,7 +48,7 @@ using FilterLayerInputData = std::array<float, kMinibatchSize * kOutputCount>;
 
 
 typedef struct ActionValue {
-  ActionValue(const Environment::ActionCode _action, const float _q_value) : 
+  ActionValue(const Environment::ActionCode _action, const float _q_value) :
     action(_action), q_value(_q_value) {
     }
   const Environment::ActionCode action;
@@ -70,14 +70,14 @@ class Transition {
       next_frame_ ( next_frame ) {
   }
 
-  bool is_terminal() const { return next_frame_ == nullptr; } 
-  
+  bool is_terminal() const { return next_frame_ == nullptr; }
+
   const State GetNextState() const;
-  
+
   const State& GetState() const { return state_; }
-  
+
   Environment::ActionCode GetAction() const { return action_; }
-  
+
   double GetReward() const { return reward_; }
 
  private:
@@ -106,7 +106,7 @@ class Fast_DQN {
         replay_memory_capacity_(replay_memory_capacity),
         gamma_(gamma),
         verbose_(verbose),
-        random_engine_(0), 
+        random_engine_(0),
         clone_frequency_(10000), // How often (steps) the target_net_ is updated
         last_clone_iter_(0) {   // Iteration in which the net was last cloned
         }
@@ -166,7 +166,7 @@ class Fast_DQN {
     * Clone the given net and store the result in clone_net_
     */
   void CloneNet(NetSp net);
-  
+
   /**
    * Init the target and filter layers.
    */
@@ -195,7 +195,7 @@ class Fast_DQN {
   const int clone_frequency_; // How often (steps) the target_net is updated
   int last_clone_iter_; // Iteration in which the net was last cloned
 
-  
+
   std::mt19937 random_engine_;
   bool verbose_;
 };

@@ -6,11 +6,11 @@ option(USE_SDL "Use SDL for ALE" ON)
 
 # Edit these paths to point to your caffe & ALE installations
 # when building caffe be sure and do "make distribute"
-set(ALE_ROOT_DIR "~/dev/Arcade-Learning-Environment")
-set(CAFFE_ROOT_DIR "~/dev/caffe")
+set(ALE_ROOT_DIR "~/work/Arcade-Learning-Environment")
+set(CAFFE_ROOT_DIR "~/caffe")
 list(APPEND CMAKE_PREFIX_PATH ${ALE_ROOT_DIR} ${CAFFE_ROOT_DIR})
 
-add_executable(fast_dqn src/fast_dqn_main.cpp src/fast_dqn.cpp 
+add_executable(fast_dqn src/fast_dqn_main.cpp src/fast_dqn.cpp
   src/ale_environment.cpp)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -Wno-deprecated-declarations")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
@@ -49,6 +49,10 @@ if(USE_SDL)
   add_definitions(-D__USE_SDL)
   include_directories(${SDL_INCLUDE_DIR})
   target_link_libraries(fast_dqn ${SDL_LIBRARY} ${SDL_MAIN_LIBRARY})
+endif()
+
+if(NOT CPU_ONLY)
+  include_directories(/usr/local/cuda/include)
 endif()
 
 if(CPU_ONLY)

@@ -80,7 +80,8 @@ void Fast_DQN::Initialize() {
   caffe::SolverParameter solver_param;
   caffe::ReadProtoFromTextFileOrDie(solver_param_, &solver_param);
 
-  solver_.reset(caffe::GetSolver<float>(solver_param));
+  // solver_.reset(caffe::GetSolver<float>(solver_param));
+  solver_.reset(caffe::SolverRegistry<float>::CreateSolver(solver_param));
 
   // New solver creation API.  Caution, caffe master current doesn't
   // work.  Something broke the training.
@@ -104,7 +105,7 @@ void Fast_DQN::Initialize() {
 }
 
 
-Environment::ActionCode Fast_DQN::SelectAction(const State& frames, 
+Environment::ActionCode Fast_DQN::SelectAction(const State& frames,
                                                const double epsilon) {
   return SelectActions(InputStateBatch{{frames}}, epsilon)[0];
 }
@@ -252,7 +253,7 @@ void Fast_DQN::Update() {
     target_input[i * kOutputCount + static_cast<int>(action)] = target;
     filter_input[i * kOutputCount + static_cast<int>(action)] = 1;
     if (verbose_)
-      VLOG(1) << "filter:" << environmentSp_->action_to_string(action) 
+      VLOG(1) << "filter:" << environmentSp_->action_to_string(action)
         << " target:" << target;
     for (auto j = 0; j < kInputFrameCount; ++j) {
       const State& state = transition.GetState();
@@ -341,4 +342,3 @@ void Fast_DQN::InputDataIntoLayers(NetSp net,
 }
 
 }  // namespace fast_dqn
-
