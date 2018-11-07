@@ -81,13 +81,12 @@ void Fast_DQN::Initialize() {
   caffe::ReadProtoFromTextFileOrDie(solver_param_, &solver_param);
 
   // solver_.reset(caffe::GetSolver<float>(solver_param));
-  solver_.reset(caffe::SolverRegistry<float>::CreateSolver(solver_param));
 
   // New solver creation API.  Caution, caffe master current doesn't
   // work.  Something broke the training.
   // use commit:ff16f6e43dd718921e5203f640dd57c68f01cdb3 for now.  It's slower
   // though.  Let me know if you figure out the issue.
-  // solver_.reset(caffe::SolverRegistry<float>::CreateSolver(solver_param));
+  solver_.reset(caffe::SolverRegistry<float>::CreateSolver(solver_param));
 
   net_ = solver_->net();
   InitNet(net_);
