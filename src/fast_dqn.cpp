@@ -158,7 +158,7 @@ std::vector<ActionValue> Fast_DQN::SelectActionGreedily(
     }
   }
   InputDataIntoLayers(net, frames_input, dummy_input_data_, dummy_input_data_);
-  net->ForwardPrefilled(nullptr);
+  net->Forward(nullptr);
 
   std::vector<ActionValue> results;
   results.reserve(last_frames_batch.size());
