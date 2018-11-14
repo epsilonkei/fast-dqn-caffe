@@ -7,6 +7,7 @@
 #include <iostream>
 #include <deque>
 #include <algorithm>
+#include "utils/stop_watch.hpp"
 
 DEFINE_bool(verbose, false, "verbose output");
 DEFINE_bool(gpu, true, "Use GPU to brew Caffe");
@@ -29,6 +30,7 @@ DEFINE_double(evaluate_with_epsilon, 0.05, "Epsilon value to be used in "
   "evaluation mode");
 DEFINE_double(repeat_games, 1, "Number of games played in evaluation mode");
 DEFINE_int32(steps_per_epoch, 5000, "Number of training steps per epoch");
+DEFINE_bool(timer, false, "Enable timer for computing time");
 
 double CalculateEpsilon(const int iter) {
   if (iter < FLAGS_explore) {
@@ -115,10 +117,10 @@ int main(int argc, char** argv) {
     fast_dqn::CreateEnvironment(FLAGS_gui, FLAGS_rom);
 
   // Get the vector of legal actions
-  const fast_dqn::Environment::ActionVec legal_actions = 
+  const fast_dqn::Environment::ActionVec legal_actions =
     environmentSp->GetMinimalActionSet();
 
-  fast_dqn::Fast_DQN dqn(environmentSp, legal_actions, FLAGS_solver, 
+  fast_dqn::Fast_DQN dqn(environmentSp, legal_actions, FLAGS_solver,
                          FLAGS_memory, FLAGS_gamma, FLAGS_verbose);
 
   dqn.Initialize();
@@ -131,12 +133,20 @@ int main(int argc, char** argv) {
   if (FLAGS_evaluate) {
     dqn.LoadTrainedModel(FLAGS_model);
     auto total_score = 0.0;
+    stop_watch episodes_sw = stop_watch();
+    if (FLAGS_timer) {
+      episodes_sw.start();
+    }
     for (auto i = 0; i < FLAGS_repeat_games; ++i) {
       LOG(INFO) << "game: ";
       const auto score =
           PlayOneEpisode(environmentSp, &dqn, FLAGS_evaluate_with_epsilon, false);
       LOG(INFO) << "score: " << score;
       total_score += score;
+    }
+    if (FLAGS_timer) {
+      episodes_sw.stop();
+      std::cout << episodes_sw.getTime() << std::endl;
     }
     LOG(INFO) << "total_score: " << total_score;
     return 0;
@@ -177,7 +187,7 @@ int main(int argc, char** argv) {
       running_average = train_score*plot_average_discount
         + running_average*(1.0-plot_average_discount);
 
-    if (dqn.current_iteration() >= next_epoch_boundry) {   
+    if (dqn.current_iteration() >= next_epoch_boundry) {
       double hours =  total_time / 1000. / 3600.;
       int epoc_number = static_cast<int>(
         (next_epoch_boundry)/FLAGS_steps_per_epoch);
@@ -207,4 +217,3 @@ int main(int argc, char** argv) {
 
   training_data.close();
 }
-
